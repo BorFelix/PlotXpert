@@ -1,9 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "IUnaryOperation.hxx"
-#include "IBinaryOperation.hxx"
-#include <ICustomExtendOperation.hxx>
+#include <Operation.hxx>
 #include <IPointSeries.hxx>
 #include <OperationResult.hxx>
 
