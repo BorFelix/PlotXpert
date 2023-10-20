@@ -42,3 +42,4 @@ class ICustomExtendOperation : public IOperation {
 public:
 	virtual void execute(const std::vector<CustomPointSeries<T...>*>& data, OperationResult& result) = 0;
 };
+// Test
