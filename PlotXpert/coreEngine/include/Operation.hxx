@@ -11,35 +11,32 @@
 
 enum class OperationType
 {
-	//Unary Operation
-	//Binary Operation
-	//Custom Operation
+	Unary = 0,
+	Binary,
+	CustomExtend
 };
+
+class OperationResult {};  // Placeholder for OperationResult class.
 
 class IOperation {
 public:
 	virtual ~IOperation() = default;
-	virtual OperationType getType() const = 0;
+	virtual OperationResult execute(const IPointSeries& data) = 0;
 };
-
 
 class IUnaryOperation : public IOperation {
 public:
-	virtual void execute(IPointSeries& input, OperationResult& result) = 0;
-	virtual void execute(const std::vector<IPointSeries*>& input, OperationResult& result) = 0;
+	OperationResult execute(const IPointSeries& data) override;
 };
-
 
 class IBinaryOperation : public IOperation {
 public:
-	virtual void execute(IPointSeries& input1, IPointSeries& input2, OperationResult& result) = 0;
-	virtual void execute(const std::vector<IPointSeries*>& input1, const std::vector<IPointSeries*>& input2, OperationResult& result) = 0;
+	OperationResult execute(const IPointSeries& data1, const IPointSeries& data2);
 };
 
 
 template<typename... T>
 class ICustomExtendOperation : public IOperation {
 public:
-	virtual void execute(const std::vector<CustomPointSeries<T...>*>& data, OperationResult& result) = 0;
+	OperationResult execute(const std::vector<CustomPointSeries<T...>*>& data, OperationResult& result) = 0;
 };
-// Test

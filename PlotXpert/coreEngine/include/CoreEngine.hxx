@@ -1,18 +1,45 @@
 #pragma once
+
+#include <map>
 #include <vector>
-#include <string>
-#include <Operation.hxx>
-#include <IPointSeries.hxx>
-#include <OperationResult.hxx>
+#include <mutex>
+#include "IOperationContext.hxx"
+#include "IOperation.hxx"
+#include "OperationType.hxx"
+#include "OperationResult.hxx"
+#include "OperationRegistrant.hxx"
+#include "Pool.hxx"
+#include "Cache.hxx"
+
 
 class CoreEngine {
 public:
-	void execute(IUnaryOperation& operation, IPointSeries& input, OperationResult& result);
-	void execute(IBinaryOperation& operation, IPointSeries& input1, IPointSeries& input2, OperationResult& result);
-	void execute(IUnaryOperation& operation, const std::vector<IPointSeries*>& input, OperationResult& result);
-	void execute(IBinaryOperation& operation, const std::vector<IPointSeries*>& input1, const std::vector<IPointSeries*>& input2, OperationResult& result);
+	static CoreEngine* getInstance();
+	~CoreEngine() = default;
 
+	// Methods
+	OperationResult execute(IOperationContext* context);
+	IOperationContext* getContext(OperationType type);
+	void releaseContext(IOperationContext* context);
 
-	template<typename... T>
-	void execute(ICustomExtendOperation<T...>& operation, const std::vector<CustomPointSeries<T...>*>& data, OperationResult& result);
+private:
+	std::string generateCacheKey(const IOperationContext* context);
+
+	// Constructors
+	CoreEngine() = default;
+
+	CoreEngine(const CoreEngine&) = delete;
+	CoreEngine(CoreEngine&&) = delete;
+
+	CoreEngine& operator=(const CoreEngine&) = delete;
+	CoreEngine& operator=(CoreEngine&&) = delete;
+
+	// Data members
+	static CoreEngine* instance;
+	static std::mutex mutex;
+
+	OperationRegistrant operationRegistrant;
+	Pool<IOperationContext> contextPool;
+	Cache<OperationType, IOperation*> operationCache;
+	Cache<std::string, OperationResult> resultCache;
 };
