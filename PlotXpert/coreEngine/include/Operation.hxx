@@ -1,13 +1,9 @@
 #pragma once
 
+#include <functional>
 #include <vector>
 
-#include "IPointSeries.hxx"
-#include "OperationResult.hxx"
-#include "OneDPointSeries.hxx"
-#include "TwoDPointSeries.hxx"
-#include "ThreeDPointSeries.hxx"
-#include "CustomPointSeries.hxx"
+#include <OperationResult.hxx>
 
 enum class OperationType
 {
@@ -16,27 +12,37 @@ enum class OperationType
 	CustomExtend
 };
 
-class OperationResult {};  // Placeholder for OperationResult class.
+class IPointSeries;
 
 class IOperation {
 public:
 	virtual ~IOperation() = default;
-	virtual OperationResult execute(const IPointSeries& data) = 0;
+
+	virtual OperationType getType() const = 0;
+	virtual OperationResult* execute(const std::vector<IPointSeries*>& dataSeries) = 0;
 };
 
 class IUnaryOperation : public IOperation {
 public:
-	OperationResult execute(const IPointSeries& data) override;
+	OperationResult* execute(const std::vector<IPointSeries*>& dataSeries) override final;
+
+protected:
+	virtual OperationResult* unaryExecute(IPointSeries* dataSeries1) = 0;
 };
 
 class IBinaryOperation : public IOperation {
 public:
-	OperationResult execute(const IPointSeries& data1, const IPointSeries& data2);
+	OperationResult* execute(const std::vector<IPointSeries*>& dataSeries) override final;
+
+protected:
+	virtual OperationResult* binaryExecute(IPointSeries* dataSeries1, IPointSeries* dataSeries2) = 0;
 };
 
-
-template<typename... T>
+template <class T>
 class ICustomExtendOperation : public IOperation {
 public:
-	OperationResult execute(const std::vector<CustomPointSeries<T...>*>& data, OperationResult& result) = 0;
+	OperationResult* execute(const std::vector<IPointSeries*>& dataSeries) override final;
+
+private:
+	std::function<T> m_func;
 };

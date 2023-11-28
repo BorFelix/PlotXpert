@@ -1,34 +1,30 @@
 #pragma once
 
-#include <map>
-#include <string>
+#include <mutex>
+#include <unordered_map>
+
 #include <Operation.hxx>
 
 class OperationRegistrant
 {
 public:
-	OperationRegistrant& getInstance()
-	{
-		static OperationRegistrant instance;
-		return instance;
-	}
+	static OperationRegistrant* getInstance();
 
-	void registorOperation(IOperation* operation)
-	{
-		operations[operation->getType()] = operation;
-	}	
+	void registorOperation(std::unique_ptr<IOperation> operation);
 	
-	IOperation* getOperation(OperationType operType)
-	{
-		return operations.at(operType);
-	}
+	IOperation* getOperation(const OperationType& operType);
 
 
 private:
+	static OperationRegistrant* m_instance;
+	static std::mutex m_mutex;
+
 	OperationRegistrant() = default;
 	OperationRegistrant(const OperationRegistrant&) = delete;
-	OperationRegistrant& operator=(const OperationRegistrant) = delete;
+	OperationRegistrant(OperationRegistrant&&) = delete;
+	OperationRegistrant& operator=(const OperationRegistrant&) = delete;
+	OperationRegistrant& operator=(OperationRegistrant&&) = delete;
 
-	std::map<OperationType, IOperation*> operations;
+	std::unordered_map<OperationType, std::unique_ptr<IOperation>> m_operations;
 
 };

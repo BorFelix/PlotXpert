@@ -1,7 +1,10 @@
-#include "OperationResult.hxx"
+#include <OperationResult.hxx>
+#include <PointSeries.hxx>
 
-OperationResult::OperationResult() : resultPoints(nullptr), isSuccess(false), message("") {
-	// Constructor implementation
+OperationResult::OperationResult(IPointSeries* resultPoints, bool isSuccess, std::string message) 
+	: m_resultPoints(resultPoints), m_isSuccess(isSuccess), m_message(message)
+{
+
 }
 
 // Implement getters, setters, and other utility methods

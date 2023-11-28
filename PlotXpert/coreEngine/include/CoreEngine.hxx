@@ -1,15 +1,15 @@
 #pragma once
 
 #include <map>
-#include <vector>
 #include <mutex>
-#include "IOperationContext.hxx"
-#include "IOperation.hxx"
-#include "OperationType.hxx"
-#include "OperationResult.hxx"
-#include "OperationRegistrant.hxx"
-#include "Pool.hxx"
-#include "Cache.hxx"
+#include <string>
+#include <vector>
+
+#include <Cache.hxx>
+#include <Operation.hxx>
+#include <OperationResult.hxx>
+#include <OperationContext.hxx>
+#include <OperationRegistrant.hxx>
 
 
 class CoreEngine {
@@ -19,14 +19,12 @@ public:
 
 	// Methods
 	OperationResult execute(IOperationContext* context);
-	IOperationContext* getContext(OperationType type);
-	void releaseContext(IOperationContext* context);
 
 private:
-	std::string generateCacheKey(const IOperationContext* context);
+	std::string generateCacheKey(const IOperationContext& context);
 
 	// Constructors
-	CoreEngine() = default;
+	CoreEngine();
 
 	CoreEngine(const CoreEngine&) = delete;
 	CoreEngine(CoreEngine&&) = delete;
@@ -35,11 +33,11 @@ private:
 	CoreEngine& operator=(CoreEngine&&) = delete;
 
 	// Data members
-	static CoreEngine* instance;
-	static std::mutex mutex;
+	static CoreEngine* m_instance;
+	static std::mutex m_mutex;
 
-	OperationRegistrant operationRegistrant;
-	Pool<IOperationContext> contextPool;
-	Cache<OperationType, IOperation*> operationCache;
-	Cache<std::string, OperationResult> resultCache;
+	OperationRegistrant* m_operationRegistrant;
+
+	// If the operands & operation are in the cache, means we do not have to perform calculation again, find the unique key to get the result directly.
+	Cache<std::string, std::shared_ptr<OperationResult>> m_resultCache;
 };
