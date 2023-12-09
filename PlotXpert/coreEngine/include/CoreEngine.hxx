@@ -21,7 +21,7 @@ public:
 	OperationResult execute(IOperationContext* context);
 
 private:
-	std::string generateCacheKey(const IOperationContext& context);
+	std::string generateCacheKey(const IOperationContext* context);
 
 	// Constructors
 	CoreEngine();

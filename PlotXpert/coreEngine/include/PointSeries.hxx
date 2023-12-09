@@ -1,13 +1,27 @@
 #pragma once
 
 #include <iostream>
+#include <string>
+#include <sstream>
 #include <tuple>
 #include <vector>
+
+// uuid from lib boost
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 // IPointSeries.h
 class IPointSeries {
 public:
 	virtual ~IPointSeries() = default;
+
+	virtual std::string getUniqueIdentifier() const
+	{
+		boost::uuids::random_generator generator;
+		boost::uuids::uuid uuid = generator();
+		return boost::uuids::to_string(uuid);
+	}
 };
 
 class OneDPointSeries : public IPointSeries
@@ -59,6 +73,7 @@ private:
 
 public:
 	explicit ThreeDPointSeries(const std::vector<std::tuple<double, double, double>>& points) : m_points(points) {};
+
 
 	std::tuple<double, double, double> getNthPoint(int idx) const
 	{

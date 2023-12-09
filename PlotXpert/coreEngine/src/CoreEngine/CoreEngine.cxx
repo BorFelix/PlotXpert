@@ -1,4 +1,5 @@
 #include <CoreEngine.hxx>
+#include <sstream>
 
 CoreEngine* CoreEngine::m_instance = nullptr;
 std::mutex CoreEngine::m_mutex;
@@ -25,9 +26,19 @@ CoreEngine* CoreEngine::getInstance()
 }
 
 // Hypothetical function to generate a unique key for caching
-std::string CoreEngine::generateCacheKey(const IOperationContext& context) {
+std::string CoreEngine::generateCacheKey(const IOperationContext* context) {
 
-	return "";
+	std::ostringstream keyStream;
+
+	// Include Operation Type in the key
+	keyStream << static_cast<int>(context->getOperationType());
+
+	// Include details of each IPointSeries in the key
+	for (const auto& pointSeries : context->getData()) {
+		keyStream << ":" << pointSeries->getUniqueIdentifier();
+	}
+
+	return keyStream.str();
 }
 
 OperationResult CoreEngine::execute(IOperationContext* context) {
